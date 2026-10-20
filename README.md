@@ -40,8 +40,10 @@ mini-inbox/
 ├── n8n/
 │   └── workflow.json             # exporte o workflow do n8n para este caminho
 ├── screenshots/
-│   ├── tickets.png               # capturas da interface
-│   └── n8n-workflow.png          # captura do workflow/execution no n8n
+│   ├── Home.png                  # caixa de entrada
+│   ├── Details.png               # detalhe e atualização do ticket
+│   ├── Dashboard.png             # métricas
+│   └── n8n.png                   # workflow e execução no n8n
 └── README.md
 ```
 
@@ -169,12 +171,23 @@ Dataset utilizado: [Customer Support Ticket Dataset — Kaggle](https://www.kagg
 
 ## Evidências
 
-Adicione capturas reais do projeto às pastas indicadas e mantenha estes links:
+### Caixa de entrada
 
-- Interface de tickets: `screenshots/tickets.png`
-- Dashboard: `screenshots/dashboard.png`
-- Workflow ou execução bem-sucedida do n8n: `screenshots/n8n-workflow.png`
-- Export JSON do workflow: `n8n/workflow.json`
+![Caixa de entrada do Mini Inbox](screenshots/Home.png)
+
+### Detalhe e atualização de ticket
+
+![Detalhe do ticket com opções para atualizar status e prioridade](screenshots/Details.png)
+
+### Dashboard
+
+![Dashboard com métricas processadas pelo pandas](screenshots/Dashboard.png)
+
+### Workflow n8n
+
+![Workflow n8n com execução bem-sucedida](screenshots/n8n.png)
+
+O workflow exportado está em [`n8n/workflow.json`](n8n/workflow.json).
 
 ## Observações
 

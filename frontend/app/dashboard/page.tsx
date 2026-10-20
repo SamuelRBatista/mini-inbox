@@ -1,18 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { AppShell, PageHeading } from "../components/app-shell";
 
-type DailyMetric = {
-  purchase_day: string;
-  count: number;
-};
-
-type CategoryMetric = {
-  category: string;
-  count: number;
-};
-
+type DailyMetric = { purchase_day: string; count: number };
+type CategoryMetric = { category: string; count: number };
 type Metrics = {
   source: string;
   date_field: string;
@@ -28,96 +20,79 @@ export default function DashboardPage() {
   useEffect(() => {
     fetch("http://localhost:8000/metrics")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Não foi possível carregar as métricas.");
-        }
+        if (!response.ok) throw new Error("Não foi possível carregar as métricas.");
         return response.json();
       })
       .then((data: Metrics) => setMetrics(data))
-      .catch(() => setError("Confira se a API está rodando e se o ETL gerou metrics.json."));
+      .catch(() => setError("Confira se a API está rodando e se o ETL gerou o arquivo de métricas."));
   }, []);
 
-  const recentDays = metrics?.tickets_per_purchase_day.slice(-10).reverse() ?? [];
+  const recentDays = metrics?.tickets_per_purchase_day.slice(-10) ?? [];
+  const maxDaily = Math.max(...recentDays.map((day) => day.count), 1);
+  const maxCategory = Math.max(...(metrics?.top_ticket_types.map((item) => item.count) ?? []), 1);
+  const formatDay = (value: string) => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(`${value}T12:00:00`));
 
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-10 text-slate-900">
-      <div className="mx-auto max-w-5xl">
-        <nav className="mb-8 flex gap-5">
-          <Link href="/tickets" className="font-medium text-blue-700 hover:underline">
-            Tickets
-          </Link>
-          <Link href="/dashboard" className="font-medium text-blue-700 hover:underline">
-            Dashboard
-          </Link>
-        </nav>
+    <AppShell>
+      <PageHeading eyebrow="Visão geral" title="Dashboard" description="Um resumo dos dados de atendimento do seu dataset." />
 
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-2 text-slate-600">
-          Métricas calculadas com pandas a partir do dataset do Kaggle.
-        </p>
+      {error && <div role="alert" className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-[13px] text-rose-700">{error}</div>}
+      {!metrics && !error && <div className="space-y-3" aria-live="polite"><div className="h-28 animate-pulse rounded-2xl bg-white" /><div className="h-72 animate-pulse rounded-2xl bg-white" /></div>}
 
-        {error && <p className="mt-6 text-red-700">{error}</p>}
-        {!metrics && !error && <p className="mt-6">Carregando métricas...</p>}
+      {metrics && (
+        <>
+          <section className="grid gap-3 sm:grid-cols-3">
+            <article className="soft-shadow rounded-2xl border border-[#e9ece8] bg-white p-5">
+              <p className="text-[11px] font-medium text-[#87918b]">Tickets no dataset</p>
+              <div className="mt-3 flex items-end justify-between"><p className="text-[30px] font-semibold leading-none tracking-[-0.05em] text-[#1b2824]">{metrics.total_tickets.toLocaleString("pt-BR")}</p><span className="grid size-9 place-items-center rounded-xl bg-[#e8f3ee] text-[#1b7162]">▤</span></div>
+              <p className="mt-3 text-[10px] text-[#9aa39e]">Registros processados pelo ETL</p>
+            </article>
+            <article className="soft-shadow rounded-2xl border border-[#e9ece8] bg-white p-5">
+              <p className="text-[11px] font-medium text-[#87918b]">Dias com registros</p>
+              <div className="mt-3 flex items-end justify-between"><p className="text-[30px] font-semibold leading-none tracking-[-0.05em] text-[#1b2824]">{metrics.tickets_per_purchase_day.length.toLocaleString("pt-BR")}</p><span className="grid size-9 place-items-center rounded-xl bg-[#eef2fa] text-[#566da4]">▦</span></div>
+              <p className="mt-3 text-[10px] text-[#9aa39e]">Agrupados por data de compra</p>
+            </article>
+            <article className="soft-shadow rounded-2xl border border-[#e9ece8] bg-white p-5">
+              <p className="text-[11px] font-medium text-[#87918b]">Categorias analisadas</p>
+              <div className="mt-3 flex items-end justify-between"><p className="text-[30px] font-semibold leading-none tracking-[-0.05em] text-[#1b2824]">{metrics.top_ticket_types.length}</p><span className="grid size-9 place-items-center rounded-xl bg-[#fff3e8] text-[#b57637]">◌</span></div>
+              <p className="mt-3 text-[10px] text-[#9aa39e]">Principais tipos de solicitação</p>
+            </article>
+          </section>
 
-        {metrics && (
-          <>
-            <section className="mt-8 grid gap-4 sm:grid-cols-3">
-              <article className="rounded-xl bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Tickets no dataset</p>
-                <p className="mt-2 text-3xl font-bold">{metrics.total_tickets}</p>
-              </article>
-              <article className="rounded-xl bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Dias com compras registradas</p>
-                <p className="mt-2 text-3xl font-bold">
-                  {metrics.tickets_per_purchase_day.length}
-                </p>
-              </article>
-              <article className="rounded-xl bg-white p-6 shadow-sm">
-                <p className="text-sm text-slate-500">Campo de data</p>
-                <p className="mt-2 font-semibold">{metrics.date_field}</p>
-              </article>
-            </section>
+          <section className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+            <article className="soft-shadow rounded-2xl border border-[#e9ece8] bg-white p-5 sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div><h2 className="text-[14px] font-semibold text-[#29362f]">Volume ao longo do tempo</h2><p className="mt-1 text-[11px] text-[#929c96]">Tickets por dia de compra · últimos 10 dias</p></div>
+                <span className="rounded-lg bg-[#f5f7f4] px-2.5 py-1.5 text-[10px] text-[#7f8b83]">{metrics.date_field}</span>
+              </div>
+              <div className="mt-8 flex h-[210px] items-end gap-2 border-b border-[#edf0ec] px-1 sm:gap-3">
+                {recentDays.map((day) => {
+                  const height = Math.max((day.count / maxDaily) * 100, 5);
+                  return <div key={day.purchase_day} className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
+                    <span className="text-[9px] font-medium text-[#89958e] opacity-0 transition-opacity group-hover:opacity-100">{day.count}</span>
+                    <div className="w-full max-w-8 rounded-t-md bg-[#c5dfd3] transition-colors group-hover:bg-[#4f927b]" style={{ height: `${height}%` }} title={`${day.count} tickets em ${formatDay(day.purchase_day)}`} />
+                    <span className="pb-2 text-[8px] text-[#9aa39e] sm:text-[9px]">{formatDay(day.purchase_day)}</span>
+                  </div>;
+                })}
+              </div>
+              <p className="mt-3 text-[10px] text-[#a0a9a3]">A data representa a compra, não a abertura do ticket.</p>
+            </article>
 
-            <section className="mt-6 grid gap-6 md:grid-cols-2">
-              <article className="rounded-xl bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-bold">Tipos de ticket mais comuns</h2>
-                <ul className="mt-4 divide-y divide-slate-100">
-                  {metrics.top_ticket_types.map((item) => (
-                    <li
-                      key={item.category}
-                      className="flex justify-between gap-4 py-3"
-                    >
-                      <span>{item.category}</span>
-                      <span className="font-semibold">{item.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className="rounded-xl bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-bold">
-                  Tickets por dia de compra (10 dias mais recentes)
-                </h2>
-                <ul className="mt-4 divide-y divide-slate-100">
-                  {recentDays.map((item) => (
-                    <li
-                      key={item.purchase_day}
-                      className="flex justify-between gap-4 py-3"
-                    >
-                      <span>{item.purchase_day}</span>
-                      <span className="font-semibold">{item.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </section>
-
-            <p className="mt-6 text-sm text-slate-500">
-              Fonte: {metrics.source}. A data representa a compra, não a criação do ticket.
-            </p>
-          </>
-        )}
-      </div>
-    </main>
+            <article className="soft-shadow rounded-2xl border border-[#e9ece8] bg-white p-5 sm:p-6">
+              <div><h2 className="text-[14px] font-semibold text-[#29362f]">Principais categorias</h2><p className="mt-1 text-[11px] text-[#929c96]">Tipos de solicitação mais frequentes</p></div>
+              <div className="mt-6 space-y-5">
+                {metrics.top_ticket_types.map((item, index) => (
+                  <div key={item.category}>
+                    <div className="mb-2 flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f4f6f3] text-[9px] font-semibold text-[#748079]">0{index + 1}</span><span className="truncate text-[11px] font-medium text-[#56635c]">{item.category}</span></div><span className="shrink-0 text-[10px] font-semibold text-[#55635b]">{item.count.toLocaleString("pt-BR")}</span></div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[#f0f3ef]"><div className="h-full rounded-full bg-[#74a995]" style={{ width: `${(item.count / maxCategory) * 100}%` }} /></div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </section>
+          <p className="mt-5 text-center text-[10px] text-[#a0a9a3]">Fonte: {metrics.source} · Métricas calculadas com pandas</p>
+        </>
+      )}
+    </AppShell>
   );
 }

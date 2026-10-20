@@ -22,7 +22,11 @@ Aplicação local de gerenciamento de tickets de atendimento, desenvolvida como 
 ```text
 mini-inbox/
 ├── backend/
-│   ├── main.py
+│   ├── main.py                    # composição da API FastAPI
+│   ├── api/                       # rotas e schemas HTTP
+│   ├── application/               # casos de uso e contratos
+│   ├── domain/                    # entidade e regras de negócio
+│   ├── infrastructure/            # SQLite, métricas e webhook n8n
 │   ├── requirements.txt
 │   └── tickets.db                 # criado automaticamente ao iniciar a API
 ├── data/
@@ -41,7 +45,7 @@ mini-inbox/
 └── README.md
 ```
 
-Os arquivos `tickets.db` e `metrics.json` podem ser gerados localmente seguindo os passos abaixo. Inclua o CSV do Kaggle em `data/raw/customer_support_tickets.csv` antes de executar o ETL.
+O arquivo `tickets.db` é criado pela API; `metrics.json` é gerado pelo ETL. O CSV utilizado está incluído em `data/raw/customer_support_tickets.csv`.
 
 ## Requisitos
 

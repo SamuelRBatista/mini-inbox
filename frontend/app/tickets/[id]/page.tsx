@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -17,7 +17,7 @@ type Ticket = {
 
 type TicketChange = Partial<Pick<Ticket, "status" | "priority">>;
 
-export default function TicketDetailPage() {
+function TicketDetailContent() {
   const { id } = useParams<{ id: string }>();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [status, setStatus] = useState<Ticket["status"]>("open");
@@ -87,7 +87,10 @@ export default function TicketDetailPage() {
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10 text-slate-900">
       <div className="mx-auto max-w-3xl">
-        <Link href="/tickets" className="font-medium text-blue-700 hover:underline">
+        <Link
+          href="/tickets"
+          className="font-medium text-blue-700 hover:underline"
+        >
           ← Voltar para tickets
         </Link>
 
@@ -101,10 +104,12 @@ export default function TicketDetailPage() {
               <dt className="text-sm text-slate-500">Cliente</dt>
               <dd className="font-medium">{ticket.customer_name}</dd>
             </div>
+
             <div>
               <dt className="text-sm text-slate-500">Canal</dt>
               <dd className="font-medium capitalize">{ticket.channel}</dd>
             </div>
+
             <div>
               <dt className="text-sm text-slate-500">Criado em</dt>
               <dd className="font-medium">
@@ -118,16 +123,20 @@ export default function TicketDetailPage() {
               <label htmlFor="status" className="mb-2 block font-medium">
                 Status
               </label>
+
               <select
                 id="status"
                 value={status}
-                onChange={(event) => setStatus(event.target.value as Ticket["status"])}
+                onChange={(event) =>
+                  setStatus(event.target.value as Ticket["status"])
+                }
                 className="w-full rounded-lg border border-slate-300 px-3 py-2"
               >
                 <option value="open">Aberto</option>
                 <option value="in_progress">Em andamento</option>
                 <option value="closed">Fechado</option>
               </select>
+
               <button
                 onClick={() => saveChange({ status })}
                 disabled={saving}
@@ -141,6 +150,7 @@ export default function TicketDetailPage() {
               <label htmlFor="priority" className="mb-2 block font-medium">
                 Prioridade
               </label>
+
               <select
                 id="priority"
                 value={priority}
@@ -153,6 +163,7 @@ export default function TicketDetailPage() {
                 <option value="medium">Média</option>
                 <option value="high">Alta</option>
               </select>
+
               <button
                 onClick={() => saveChange({ priority })}
                 disabled={saving}
@@ -168,5 +179,13 @@ export default function TicketDetailPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function TicketDetailPage() {
+  return (
+    <Suspense fallback={<main className="p-10">Carregando ticket...</main>}>
+      <TicketDetailContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,65 @@
+{
+  "name": "Mini Inbox - Ticket Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mini-inbox-ticket-event",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        -304
+      ],
+      "id": "2042c896-cb8c-4322-9188-1ed1fdf6b3e4",
+      "name": "Webhook",
+      "webhookId": "851d121d-fec4-4e89-b5a0-ac8ac6bdc573"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://httpbin.org/post",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -448,
+        -304
+      ],
+      "id": "37beab2d-783f-4ceb-b49a-4266abf8162d",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cd1056ec-4a0e-497b-844d-62cc3a4c12de",
+  "meta": {
+    "instanceId": "135ad34cd87f5af2b2a43cc3f6520419bf809fcb18505a0f9722a1a3ce98ffdd"
+  },
+  "id": "CYm14Xd9lXx9t6N6",
+  "tags": []
+}

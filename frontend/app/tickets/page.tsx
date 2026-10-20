@@ -49,14 +49,23 @@ export default function TicketsPage() {
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10 text-slate-900">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">
-            Mini Inbox
-          </p>
-          <h1 className="mt-2 text-3xl font-bold">Tickets</h1>
-          <p className="mt-2 text-slate-600">
-            Consulte e encontre tickets de atendimento.
-          </p>
+        <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">
+              Mini Inbox
+            </p>
+            <h1 className="mt-2 text-3xl font-bold">Tickets</h1>
+            <p className="mt-2 text-slate-600">
+              Consulte e encontre tickets de atendimento.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard"
+            className="rounded-lg bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800"
+          >
+            Ver dashboard
+          </Link>
         </header>
 
         <section className="rounded-xl bg-white p-6 shadow-sm">
